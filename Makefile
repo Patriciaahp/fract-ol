@@ -1,6 +1,6 @@
 NAME = fractol
 
-SRCS = fractol.c mandelbrot.c utils.c
+SRCS = fractol.c mandelbrot.c julia.c utils.c
 OBJS = $(SRCS:.c=.o)
 
 CC = cc
@@ -21,3 +21,5 @@ fclean: clean
 	rm -f $(NAME)
 
 re: fclean all
+
+.PHONY: all clean fclean re

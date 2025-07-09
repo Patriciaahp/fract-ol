@@ -1,9 +1,9 @@
 #include "fractol.h"
 
-static int	mandelbrot(double cr, double ci)
+static int	julia(double zr, double zi, double cr, double ci)
 {
 	int		i = 0;
-	double	zr = 0, zi = 0, tmp;
+	double	tmp;
 
 	while (zr * zr + zi * zi <= 4 && i < 100)
 	{
@@ -21,10 +21,10 @@ static void	put_pixel(t_fractal *f, int x, int y, int color)
 	*(unsigned int *)dst = color;
 }
 
-void	draw_mandelbrot(t_fractal *f)
+void	draw_julia(t_fractal *f)
 {
 	int		x, y, it;
-	double	cr, ci;
+	double	zr, zi;
 
 	y = 0;
 	while (y < HEIGHT)
@@ -32,9 +32,9 @@ void	draw_mandelbrot(t_fractal *f)
 		x = 0;
 		while (x < WIDTH)
 		{
-			cr = (x - WIDTH / 2.0) * 4.0 / WIDTH / f->zoom + f->offset_x;
-			ci = (y - HEIGHT / 2.0) * 4.0 / HEIGHT / f->zoom + f->offset_y;
-			it = mandelbrot(cr, ci);
+			zr = (x - WIDTH / 2.0) * 4.0 / WIDTH / f->zoom + f->offset_x;
+			zi = (y - HEIGHT / 2.0) * 4.0 / HEIGHT / f->zoom + f->offset_y;
+			it = julia(zr, zi, f->julia_cr, f->julia_ci);
 			put_pixel(f, x, y, it * 0x00101010);
 			x++;
 		}
