@@ -1,70 +1,78 @@
 #include "fractol.h"
 
-int	handle_key(int keycode, t_fractal *f)
+void	put_pixel(t_fractal *f, int x, int y, int color)
 {
-	if (keycode == 65307) // ESC
-		close_window(f);
-	else if (keycode == 65361) // ←
-		f->offset_x -= 0.1 / f->zoom;
-	else if (keycode == 65363) // →
-		f->offset_x += 0.1 / f->zoom;
-	else if (keycode == 65362) // ↑
-		f->offset_y -= 0.1 / f->zoom;
-	else if (keycode == 65364) // ↓
-		f->offset_y += 0.1 / f->zoom;
-	else if (keycode == 61 || keycode == 65451) // +
-		f->zoom *= 1.1;
-	else if (keycode == 45 || keycode == 65453) // -
-		f->zoom /= 1.1;
+	char	*dst;
 
-	if (ft_strncmp(f->name, "mandelbrot", 10) == 0)
-		draw_mandelbrot(f);
-	else if (ft_strncmp(f->name, "julia", 5) == 0)
-		draw_julia(f);
-	return (0);
+	if (x < 0 || x >= f->width || y < 0 || y >= f->height)
+		return ;
+	dst = f->addr + (y * f->ll + x * (f->bpp / 8));
+	*(unsigned int *)dst = color;
 }
 
-int	close_window(t_fractal *f)
+int	get_color(int iterations, int max_iter)
 {
-	mlx_destroy_window(f->mlx, f->win);
-	exit(0);
-	return (0);
+	if (iterations == max_iter)
+		return (0x000000);
+	return ((iterations * 9) % 255 << 16)
+		| ((iterations * 2) % 255 << 8)
+		| ((iterations * 5) % 255);
 }
 
-void	init_window(t_fractal *f)
+void	draw_mandelbrot(t_fractal *f)
 {
-	f->zoom = 1;
-	f->offset_x = -0.5;
-	f->offset_y = 0;
-	f->mlx = mlx_init();
-	f->win = mlx_new_window(f->mlx, WIDTH, HEIGHT, f->name);
-	f->img = mlx_new_image(f->mlx, WIDTH, HEIGHT);
-	f->addr = mlx_get_data_addr(f->img, &f->bpp, &f->line_len, &f->endian);
+	int		x;
+	int		y;
+	double	pr, pi, zr, zi, tmp;
+	int		it;
 
-	if (ft_strncmp(f->name, "mandelbrot", 10) == 0)
-		draw_mandelbrot(f);
-	else if (ft_strncmp(f->name, "julia", 5) == 0)
-		draw_julia(f);
-
-	mlx_key_hook(f->win, handle_key, f);
-	mlx_hook(f->win, 17, 0, close_window, f);
-	mlx_loop(f->mlx);
-}
-
-int	main(int argc, char **argv)
-{
-	t_fractal f;
-
-	if (argc != 2 || 
-		(ft_strncmp(argv[1], "mandelbrot", 10) != 0 &&
-		ft_strncmp(argv[1], "julia", 5) != 0))
+	y = -1;
+	while (++y < f->height)
 	{
-		write(1, "Usage: ./fractol mandelbrot | julia\n", 37);
-		return (1);
+		x = -1;
+		while (++x < f->width)
+		{
+			pr = 1.5 * (x - f->width / 2) / (0.5 * f->zoom * f->width) + f->move_x;
+			pi = (y - f->height / 2) / (0.5 * f->zoom * f->height) + f->move_y;
+			zr = 0;
+			zi = 0;
+			it = 0;
+			while (zr * zr + zi * zi < 4 && it < f->max_iter)
+			{
+				tmp = zr * zr - zi * zi + pr;
+				zi = 2 * zr * zi + pi;
+				zr = tmp;
+				it++;
+			}
+			put_pixel(f, x, y, get_color(it, f->max_iter));
+		}
 	}
-	f.name = argv[1];
-	f.julia_cr = -0.8;
-	f.julia_ci = 0.156;
-	init_window(&f);
-	return (0);
+}
+
+void	draw_julia(t_fractal *f)
+{
+	int		x;
+	int		y;
+	double	zr, zi, tmp;
+	int		it;
+
+	y = -1;
+	while (++y < f->height)
+	{
+		x = -1;
+		while (++x < f->width)
+		{
+			zr = 1.5 * (x - f->width / 2) / (0.5 * f->zoom * f->width) + f->move_x;
+			zi = (y - f->height / 2) / (0.5 * f->zoom * f->height) + f->move_y;
+			it = 0;
+			while (zr * zr + zi * zi < 4 && it < f->max_iter)
+			{
+				tmp = zr * zr - zi * zi + f->julia_cr;
+				zi = 2 * zr * zi + f->julia_ci;
+				zr = tmp;
+				it++;
+			}
+			put_pixel(f, x, y, get_color(it, f->max_iter));
+		}
+	}
 }

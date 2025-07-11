@@ -1,25 +1,26 @@
 NAME = fractol
 
-SRCS = fractol.c mandelbrot.c julia.c utils.c
-OBJS = $(SRCS:.c=.o)
-
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -Iminilibx-linux
 
-MLX_DIR = ./minilibx-linux
-MLX = -L$(MLX_DIR) -lmlx -lXext -lX11 -lm
+SRC = main.c fractol.c hooks.c init.c
+OBJ = $(SRC:.c=.o)
+
+MLX = -Lminilibx-linux -lmlx -lXext -lX11 -lm -lbsd
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(MLX)
+$(NAME): $(OBJ)
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(MLX)
 
 clean:
-	rm -f $(OBJS)
+	rm -f $(OBJ)
 
 fclean: clean
 	rm -f $(NAME)
 
 re: fclean all
 
-.PHONY: all clean fclean re
+bonus: all
+
+.PHONY: all clean fclean re bonus
