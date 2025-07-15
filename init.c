@@ -5,7 +5,7 @@ void	init_window(t_fractal *f)
 	f->mlx = mlx_init();
 	f->win = mlx_new_window(f->mlx, f->width, f->height, f->name);
 	f->img = mlx_new_image(f->mlx, f->width, f->height);
-	f->addr = mlx_get_data_addr(f->img, &f->bpp, &f->ll, &f->endian);
+	f->addr = mlx_get_data_addr(f->img, &f->bpp, &f->line_len, &f->endian);
 	if (strcmp(f->name, "mandelbrot") == 0)
 		draw_mandelbrot(f);
 	else if (strcmp(f->name, "julia") == 0)

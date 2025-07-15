@@ -6,7 +6,7 @@ void	put_pixel(t_fractal *f, int x, int y, int color)
 
 	if (x < 0 || x >= f->width || y < 0 || y >= f->height)
 		return ;
-	dst = f->addr + (y * f->ll + x * (f->bpp / 8));
+	dst = f->addr + (y * f->line_len + x * (f->bpp / 8));
 	*(unsigned int *)dst = color;
 }
 
@@ -21,10 +21,8 @@ int	get_color(int iterations, int max_iter)
 
 void	draw_mandelbrot(t_fractal *f)
 {
-	int		x;
-	int		y;
-	double	pr, pi, zr, zi, tmp;
-	int		it;
+	int		x, y, it;
+	double	cr, ci, zr, zi, tmp;
 
 	y = -1;
 	while (++y < f->height)
@@ -32,15 +30,15 @@ void	draw_mandelbrot(t_fractal *f)
 		x = -1;
 		while (++x < f->width)
 		{
-			pr = 1.5 * (x - f->width / 2) / (0.5 * f->zoom * f->width) + f->move_x;
-			pi = (y - f->height / 2) / (0.5 * f->zoom * f->height) + f->move_y;
+			cr = (x - f->width / 2.0) * 4.0 / f->width / f->zoom + f->move_x;
+			ci = (y - f->height / 2.0) * 4.0 / f->height / f->zoom + f->move_y;
 			zr = 0;
 			zi = 0;
 			it = 0;
 			while (zr * zr + zi * zi < 4 && it < f->max_iter)
 			{
-				tmp = zr * zr - zi * zi + pr;
-				zi = 2 * zr * zi + pi;
+				tmp = zr * zr - zi * zi + cr;
+				zi = 2 * zr * zi + ci;
 				zr = tmp;
 				it++;
 			}
@@ -51,10 +49,8 @@ void	draw_mandelbrot(t_fractal *f)
 
 void	draw_julia(t_fractal *f)
 {
-	int		x;
-	int		y;
+	int		x, y, it;
 	double	zr, zi, tmp;
-	int		it;
 
 	y = -1;
 	while (++y < f->height)
@@ -62,8 +58,8 @@ void	draw_julia(t_fractal *f)
 		x = -1;
 		while (++x < f->width)
 		{
-			zr = 1.5 * (x - f->width / 2) / (0.5 * f->zoom * f->width) + f->move_x;
-			zi = (y - f->height / 2) / (0.5 * f->zoom * f->height) + f->move_y;
+			zr = (x - f->width / 2.0) * 4.0 / f->width / f->zoom + f->move_x;
+			zi = (y - f->height / 2.0) * 4.0 / f->height / f->zoom + f->move_y;
 			it = 0;
 			while (zr * zr + zi * zi < 4 && it < f->max_iter)
 			{

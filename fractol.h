@@ -15,7 +15,7 @@ typedef struct s_fractal
 	void	*img;
 	char	*addr;
 	int		bpp;
-	int		ll;
+	int		line_len;
 	int		endian;
 	int		width;
 	int		height;

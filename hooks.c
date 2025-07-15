@@ -12,6 +12,7 @@ int	handle_key(int keycode, t_fractal *f)
 		f->move_y -= 0.1 / f->zoom;
 	else if (keycode == 65364) // Down
 		f->move_y += 0.1 / f->zoom;
+
 	if (strcmp(f->name, "mandelbrot") == 0)
 		draw_mandelbrot(f);
 	else if (strcmp(f->name, "julia") == 0)
@@ -22,7 +23,7 @@ int	handle_key(int keycode, t_fractal *f)
 
 int	handle_mouse(int button, int x, int y, t_fractal *f)
 {
-	double	scale = (button == 4) ? 1.1 : 0.9;
+	double	scale = (button == 4) ? 1.1 : (button == 5) ? 0.9 : 1.0;
 	double	px = (double)x / f->width * 2.0 - 1.0;
 	double	py = (double)y / f->height * 2.0 - 1.0;
 
@@ -31,6 +32,7 @@ int	handle_mouse(int button, int x, int y, t_fractal *f)
 		f->zoom *= scale;
 		f->move_x += px / f->zoom * (1 - scale);
 		f->move_y += py / f->zoom * (1 - scale);
+
 		if (strcmp(f->name, "mandelbrot") == 0)
 			draw_mandelbrot(f);
 		else if (strcmp(f->name, "julia") == 0)
