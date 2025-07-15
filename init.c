@@ -1,18 +1,28 @@
 #include "fractol.h"
 
-void	init_window(t_fractal *f)
+void	put_pixel(t_fractal *f, int x, int y, int color)
 {
+	char	*dst;
+
+	dst = f->addr + (y * f->line_len + x * (f->bpp / 8));
+	*(unsigned int *)dst = color;
+}
+
+void	init_fractal(t_fractal *f, char *name)
+{
+	f->name = name;
+	f->zoom = 1.0;
+	f->offset_x = 0;
+	f->offset_y = 0;
 	f->mlx = mlx_init();
-	f->win = mlx_new_window(f->mlx, f->width, f->height, f->name);
-	f->img = mlx_new_image(f->mlx, f->width, f->height);
+	f->win = mlx_new_window(f->mlx, WIDTH, HEIGHT, name);
+	f->img = mlx_new_image(f->mlx, WIDTH, HEIGHT);
 	f->addr = mlx_get_data_addr(f->img, &f->bpp, &f->line_len, &f->endian);
-	if (strcmp(f->name, "mandelbrot") == 0)
-		draw_mandelbrot(f);
-	else if (strcmp(f->name, "julia") == 0)
-		draw_julia(f);
-	mlx_put_image_to_window(f->mlx, f->win, f->img, 0, 0);
-	mlx_key_hook(f->win, handle_key, f);
-	mlx_mouse_hook(f->win, handle_mouse, f);
-	mlx_hook(f->win, 17, 0, close_program, f);
-	mlx_loop(f->mlx);
+}
+
+int	get_color(int iter)
+{
+	if (iter == MAX_ITER)
+		return (0x000000);
+	return (0x00FF00 * iter / MAX_ITER);
 }

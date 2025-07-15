@@ -1,30 +1,10 @@
 #include "fractol.h"
 
-static int	julia(double zr, double zi, double cr, double ci)
+void draw_julia(t_fractal *f)
 {
-	int		i = 0;
-	double	tmp;
-
-	while (zr * zr + zi * zi <= 4 && i < 100)
-	{
-		tmp = zr * zr - zi * zi + cr;
-		zi = 2 * zr * zi + ci;
-		zr = tmp;
-		i++;
-	}
-	return (i);
-}
-
-static void	put_pixel(t_fractal *f, int x, int y, int color)
-{
-	char	*dst = f->addr + (y * f->line_len + x * (f->bpp / 8));
-	*(unsigned int *)dst = color;
-}
-
-void	draw_julia(t_fractal *f)
-{
-	int		x, y, it;
-	double	zr, zi;
+	int x, y, i;
+	t_complex z;
+	double temp;
 
 	y = 0;
 	while (y < HEIGHT)
@@ -32,13 +12,19 @@ void	draw_julia(t_fractal *f)
 		x = 0;
 		while (x < WIDTH)
 		{
-			zr = (x - WIDTH / 2.0) * 4.0 / WIDTH / f->zoom + f->offset_x;
-			zi = (y - HEIGHT / 2.0) * 4.0 / HEIGHT / f->zoom + f->offset_y;
-			it = julia(zr, zi, f->julia_cr, f->julia_ci);
-			put_pixel(f, x, y, it * 0x00101010);
+			z.re = (x - WIDTH / 2.0) / (0.5 * f->zoom * WIDTH) + f->offset_x;
+			z.im = (y - HEIGHT / 2.0) / (0.5 * f->zoom * HEIGHT) + f->offset_y;
+			i = 0;
+			while (z.re * z.re + z.im * z.im <= 4 && i < MAX_ITER)
+			{
+				temp = z.re * z.re - z.im * z.im + f->julia_k.re;
+				z.im = 2 * z.re * z.im + f->julia_k.im;
+				z.re = temp;
+				i++;
+			}
+			put_pixel(f, x, y, get_color(i));
 			x++;
 		}
 		y++;
 	}
-	mlx_put_image_to_window(f->mlx, f->win, f->img, 0, 0);
 }

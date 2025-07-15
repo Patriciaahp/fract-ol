@@ -1,17 +1,17 @@
 NAME = fractol
 
-CC = cc
-CFLAGS = -Wall -Wextra -Werror -Iminilibx-linux
-
-SRC = main.c fractol.c hooks.c init.c
+SRC = main.c fractol.c hooks.c init.c julia.c mandelbrot.c utils.c
 OBJ = $(SRC:.c=.o)
 
-MLX = -Lminilibx-linux -lmlx -lXext -lX11 -lm -lbsd
+CC = cc
+CFLAGS = -Wall -Wextra -Werror -Iminilibx-linux
+LDFLAGS = -Lminilibx-linux -lmlx -lXext -lX11 -lm
 
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(MLX)
+	$(MAKE) -C minilibx-linux
+	$(CC) $(OBJ) -o $(NAME) $(LDFLAGS)
 
 clean:
 	rm -f $(OBJ)
@@ -20,5 +20,6 @@ fclean: clean
 	rm -f $(NAME)
 
 re: fclean all
+
 
 .PHONY: all clean fclean re

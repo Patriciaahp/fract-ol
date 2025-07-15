@@ -1,34 +1,37 @@
 #include "fractol.h"
 
-static void	usage(void)
+int	handle_no_args(void)
 {
 	write(1, "Usage:\n", 7);
-	write(1, "./fractol mandelbrot\n", 22);
-	write(1, "./fractol julia [real] [imaginary]\n", 35);
-	exit(0);
+write(1, "./fractol mandelbrot\n", 22);
+	write(1, "./fractol julia [real] [imaginary]\n", 36);
+	return (1);
 }
 
 int	main(int argc, char **argv)
 {
-	t_fractal	f;
+	t_fractal fractal;
 
-	if (argc < 2 || (strcmp(argv[1], "mandelbrot") != 0
-			&& strcmp(argv[1], "julia") != 0))
-		usage();
-	f.name = argv[1];
-	f.width = 800;
-	f.height = 800;
-	f.zoom = 1.0;
-	f.move_x = 0.0;
-	f.move_y = 0.0;
-	f.max_iter = 100;
-	f.julia_cr = -0.8;
-	f.julia_ci = 0.156;
-	if (argc == 4 && strcmp(argv[1], "julia") == 0)
+	if (argc < 2)
+		return (handle_no_args());
+	init_fractal(&fractal, argv[1]);
+	if (!strcmp(argv[1], "julia"))
 	{
-		f.julia_cr = atof(argv[2]);
-		f.julia_ci = atof(argv[3]);
+		if (argc == 4)
+		{
+			fractal.julia_k.re = atof(argv[2]);
+			fractal.julia_k.im = atof(argv[3]);
+		}
+		else
+		{
+			fractal.julia_k.re = -0.4;
+			fractal.julia_k.im = 0.6;
+		}
 	}
-	init_window(&f);
+	draw_fractal(&fractal);
+	mlx_key_hook(fractal.win, key_hook, &fractal);
+	mlx_mouse_hook(fractal.win, mouse_hook, &fractal);
+	mlx_hook(fractal.win, 17, 0, close_window, &fractal);
+	mlx_loop(fractal.mlx);
 	return (0);
 }
