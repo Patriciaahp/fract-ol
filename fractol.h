@@ -11,12 +11,10 @@
 # define HEIGHT 800
 # define MAX_ITER 100
 
-// Key codes
 # define ESC_KEY       65307
 
-// Mouse buttons
-# define ZOOM_IN       4  // Scroll up
-# define ZOOM_OUT      5  // Scroll down
+# define ZOOM_IN       4
+# define ZOOM_OUT      5
 
 
 typedef struct s_complex {
